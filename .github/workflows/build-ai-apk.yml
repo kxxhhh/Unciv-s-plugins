@@ -14,7 +14,7 @@ env:
 
 jobs:
   build-apk:
-    name: Build Android debug APK
+    name: Build APK
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -25,19 +25,26 @@ jobs:
           java-version: 21
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v4
-        with:
-          packages: 'platforms;android-36 build-tools;36.0.0 platform-tools'
+        run: |
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd /tmp
+          curl -fSL -o cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip
+          unzip -q cmdtools.zip -d stage
+          mv stage/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Build Android debug APK
+      - name: Build debug APK
         run: |
           chmod +x gradlew
           ./gradlew :android:assembleDebug --stacktrace
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v5
         with:
           name: Unciv-AI-debug
