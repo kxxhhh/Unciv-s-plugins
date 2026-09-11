@@ -25,6 +25,7 @@ enum class OptionsPopupPages(
         override fun visible(withDebug: Boolean) = GUI.keyboardAvailable
     },
     Advanced("Advanced", "OtherIcons/Settings", { AdvancedTab(this) }),
+    AI("AI", "OtherIcons/Settings", { AITab(this) }),
     ModCheck("Locate mod errors", "OtherIcons/Mods", { ModCheckTab(this) }) {
         override fun visible(withDebug: Boolean) = RulesetCache.size > BaseRuleset.entries.size
     },

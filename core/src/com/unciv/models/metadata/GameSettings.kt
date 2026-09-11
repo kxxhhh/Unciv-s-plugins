@@ -15,6 +15,7 @@ import com.unciv.ui.components.fonts.FontFamilyData
 import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.input.KeyboardBindings
 import com.unciv.ui.screens.worldscreen.NotificationsScroll
+import com.unciv.ai.AiSettings
 import com.unciv.utils.Display
 import com.unciv.utils.ScreenOrientation
 import java.awt.Rectangle
@@ -197,6 +198,10 @@ class GameSettings {
     /** Persist the history of successful developer console commands */
     val consoleCommandHistory = ArrayList<String>()
 
+    //endregion
+
+    //region 10: AI
+    var ai = AiSettings()
     //endregion
 
 

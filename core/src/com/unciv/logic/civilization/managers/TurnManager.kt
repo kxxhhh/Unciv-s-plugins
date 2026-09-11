@@ -3,6 +3,7 @@ package com.unciv.logic.civilization.managers
 import com.unciv.UncivGame
 import com.unciv.logic.VictoryData
 import com.unciv.logic.automation.civilization.NextTurnAutomation
+import com.unciv.ai.LLMTurnAutomation
 import com.unciv.logic.city.managers.CityTurnManager
 import com.unciv.logic.civilization.*
 import com.unciv.logic.civilization.diplomacy.DiplomacyTurnManager.nextTurn
@@ -373,7 +374,12 @@ class TurnManager(val civInfo: Civilization) {
             return
         timeThis("automateTurn") {
             // Do stuff
-        NextTurnAutomation.automateCivMoves(civInfo)
+        val aiSettings = UncivGame.Current.settings.ai
+        if (aiSettings.enabled && aiSettings.isCivLlmControlled(civInfo.civName)) {
+            LLMTurnAutomation.runTurn(civInfo)
+        } else {
+            NextTurnAutomation.automateCivMoves(civInfo)
+        }
 
         // Update barbarian camps
         if (civInfo.isBarbarian && !civInfo.gameInfo.gameParameters.noBarbarians)
