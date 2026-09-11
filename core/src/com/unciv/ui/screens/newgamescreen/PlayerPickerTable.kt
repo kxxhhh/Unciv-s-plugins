@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.unciv.Constants
 import com.unciv.UncivGame
+import com.unciv.ai.AiSettings
 import com.unciv.logic.IdChecker
 import com.unciv.logic.civilization.PlayerType
 import com.unciv.logic.civilization.PlayerType.AI
@@ -212,6 +213,19 @@ class PlayerPickerTable(
             }
         }
         updatePlayerTypeButtonEnabled()
+
+        // LLM AI toggle - only show for AI players with a specific civ chosen
+        if (player.playerType == PlayerType.AI && player.chosenCiv != Constants.random) {
+            val aiSettings = UncivGame.Current.settings.ai
+            val isLlm = aiSettings.llmControlledCivs.contains(player.chosenCiv)
+            val llmCheck = "🤖 LLM".toCheckBox(isLlm) { checked ->
+                if (checked)
+                    aiSettings.llmControlledCivs.add(player.chosenCiv)
+                else
+                    aiSettings.llmControlledCivs.remove(player.chosenCiv)
+            }
+            playerTable.add(llmCheck).pad(5f).right().row()
+        }
 
         nationTable.onClick {
             if (locked) return@onClick
