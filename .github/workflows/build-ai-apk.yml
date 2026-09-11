@@ -41,8 +41,13 @@ jobs:
 
       - name: Build debug APK
         run: |
+          echo "=== Java ===" && java -version
+          echo "=== ANDROID_HOME ===" && echo $ANDROID_HOME
+          echo "=== SDK contents ===" && ls $ANDROID_HOME/platforms/ && ls $ANDROID_HOME/build-tools/
+          echo "=== gradle files ===" && ls -la gradlew build.gradle.kts settings.gradle.kts
           chmod +x gradlew
-          ./gradlew :android:assembleDebug --stacktrace
+          ./gradlew :core:compileKotlin --stacktrace 2>&1 | tail -30
+          ./gradlew :android:assembleDebug --stacktrace 2>&1 | tail -50
 
       - name: Upload APK
         uses: actions/upload-artifact@v5
