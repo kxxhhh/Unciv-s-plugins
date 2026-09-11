@@ -6,7 +6,6 @@ on:
       - 'README.md'
       - 'README-AI.md'
       - 'docs/**'
-      - '.github/ISSUE_TEMPLATE/**'
   workflow_dispatch:
 
 env:
@@ -24,34 +23,15 @@ jobs:
           distribution: 'temurin'
           java-version: 21
 
-      - name: Setup Android SDK
-        run: |
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          cd /tmp
-          curl -fSL -o cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip
-          unzip -q cmdtools.zip -d stage
-          mv stage/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
-          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+      - uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@v6
 
-      - name: Build debug APK
-        run: |
-          echo "=== Java ===" && java -version
-          echo "=== ANDROID_HOME ===" && echo $ANDROID_HOME
-          echo "=== SDK contents ===" && ls $ANDROID_HOME/platforms/ && ls $ANDROID_HOME/build-tools/
-          echo "=== gradle files ===" && ls -la gradlew build.gradle.kts settings.gradle.kts
-          chmod +x gradlew
-          ./gradlew :core:compileKotlin --stacktrace 2>&1 | tail -30
-          ./gradlew :android:assembleDebug --stacktrace 2>&1 | tail -50
+      - run: chmod +x gradlew
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v5
+      - run: ./gradlew :android:assembleDebug
+
+      - uses: actions/upload-artifact@v5
         with:
           name: Unciv-AI-debug
           path: android/build/outputs/apk/debug/*.apk
-          retention-days: 30
